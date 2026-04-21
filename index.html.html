@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>孤独度診断｜あなたの静けさタイプを知る10の質問</title>
+  <style>
+    :root {
+      --bg: #f7f4ef;
+      --card: rgba(255, 255, 255, 0.82);
+      --text: #2f3440;
+      --muted: #6b7280;
+      --line: #e7dfd2;
+      --accent: #8b6f5a;
+      --accent-soft: #efe5db;
+      --shadow: 0 12px 35px rgba(80, 63, 48, 0.10);
+      --radius: 22px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", "Noto Sans JP", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(255,255,255,0.7), transparent 35%),
+        linear-gradient(180deg, #f8f5f0 0%, #f1ece5 100%);
+      color: var(--text);
+      line-height: 1.75;
+      min-height: 100vh;
+      padding: 18px;
+    }
+
+    .app {
+      max-width: 760px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: var(--card);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255,255,255,0.7);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 26px;
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+      animation: fade 0.35s ease;
+    }
+
+    @keyframes fade {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .eyebrow {
+      font-size: 13px;
+      color: var(--muted);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+
+    h1, h2, h3, p {
+      margin-top: 0;
+    }
+
+    h1 {
+      font-size: clamp(28px, 5vw, 40px);
+      line-height: 1.3;
+      margin-bottom: 12px;
+    }
+
+    h2 {
+      font-size: clamp(24px, 4vw, 30px);
+      line-height: 1.4;
+      margin-bottom: 12px;
+    }
+
+    .lead {
+      font-size: 18px;
+      color: #4b5563;
+      margin-bottom: 20px;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .hero-box {
+      background: linear-gradient(180deg, rgba(255,255,255,0.75), rgba(239,229,219,0.65));
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+      margin: 22px 0;
+    }
+
+    .btn, .choice-btn {
+      border: none;
+      border-radius: 16px;
+      cursor: pointer;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .btn {
+      background: var(--accent);
+      color: #fff;
+      padding: 14px 20px;
+      box-shadow: 0 10px 22px rgba(139,111,90,0.22);
+    }
+
+    .btn:hover, .choice-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .btn.secondary {
+      background: #ffffff;
+      color: var(--text);
+      border: 1px solid var(--line);
+      box-shadow: none;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .progress-wrap {
+      margin-bottom: 22px;
+    }
+
+    .progress-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .progress {
+      width: 100%;
+      height: 10px;
+      background: #ebe4da;
+      border-radius: 999px;
+      overflow: hidden;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #a98872, #7c6253);
+      transition: width 0.25s ease;
+    }
+
+    .question {
+      font-size: clamp(21px, 3.4vw, 28px);
+      line-height: 1.6;
+      margin-bottom: 20px;
+    }
+
+    .choices {
+      display: grid;
+      gap: 12px;
+    }
+
+    .choice-btn {
+      text-align: left;
+      background: #fff;
+      color: var(--text);
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      width: 100%;
+    }
+
+    .choice-btn.selected {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      box-shadow: inset 0 0 0 1px rgba(139,111,90,0.25);
+    }
+
+    .result-badge {
+      display: inline-block;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 700;
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    .score-box {
+      display: grid;
+      gap: 14px;
+      margin: 18px 0 22px;
+    }
+
+    .panel {
+      background: rgba(255,255,255,0.75);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 18px;
+    }
+
+    .panel h3 {
+      font-size: 18px;
+      margin-bottom: 8px;
+    }
+
+    .share-box {
+      white-space: pre-wrap;
+      background: #fff;
+      border: 1px dashed #c8b7a7;
+      border-radius: 18px;
+      padding: 16px;
+      font-size: 14px;
+    }
+
+    .footer-note {
+      margin-top: 16px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    @media (max-width: 640px) {
+      body {
+        padding: 12px;
+      }
+
+      .card {
+        padding: 20px;
+        border-radius: 18px;
+      }
+
+      .btn, .choice-btn {
+        width: 100%;
+      }
+
+      .btn-row {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section id="startScreen" class="screen active">
+      <div class="card">
+        <div class="eyebrow">Loneliness Check</div>
+        <h1>孤独度診断<br>あなたの静けさタイプを知る10の質問</h1>
+        <p class="lead">孤独は、弱さではなく、今の自分の傾向かもしれません。</p>
+
+        <div class="hero-box">
+          <p>
+            人と会っていても、なぜか満たされない。<br>
+            一人の時間は好きなのに、ときどき強く孤独を感じる。<br>
+            そんな感覚には、いくつかの傾向があります。
+          </p>
+          <p>
+            この診断では、10の質問からあなたの「孤独度」と「静けさタイプ」を見ていきます。<br>
+            これは医療的な診断ではなく、今の自分との距離感を知るためのセルフチェックです。
+          </p>
+        </div>
+
+        <button class="btn" id="startBtn">診断をはじめる</button>
+      </div>
+    </section>
+
+    <section id="questionScreen" class="screen">
+      <div class="card">
+        <div class="progress-wrap">
+          <div class="progress-meta">
+            <span id="questionCounter">Q1 / 10</span>
+            <span>今のあなたにどのくらい当てはまりますか？</span>
+          </div>
+          <div class="progress">
+            <div id="progressBar" class="progress-bar"></div>
+          </div>
+        </div>
+
+        <h2 id="questionText" class="question"></h2>
+
+        <div id="choices" class="choices"></div>
+
+        <div class="btn-row">
+          <button class="btn secondary" id="backBtn">戻る</button>
+          <button class="btn" id="nextBtn">次へ</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="resultScreen" class="screen">
+      <div class="card">
+        <div class="result-badge">診断結果</div>
+        <h2>あなたの孤独度は <span id="levelText"></span> です</h2>
+        <p class="lead">今のあなたは <strong id="typeName"></strong> の傾向があります。</p>
+
+        <div class="score-box">
+          <div class="panel">
+            <h3>スコア</h3>
+            <p><strong id="scoreText"></strong></p>
+            <p id="levelDescription"></p>
+          </div>
+
+          <div class="panel">
+            <h3 id="typeHeading"></h3>
+            <p id="typeDescription"></p>
+          </div>
+
+          <div class="panel">
+            <h3>今日の小さな行動</h3>
+            <p id="actionText"></p>
+          </div>
+
+          <div class="panel">
+            <h3>ひとこと</h3>
+            <p id="closingText"></p>
+          </div>
+
+          <div class="panel">
+            <h3>シェア用テキスト</h3>
+            <div id="shareText" class="share-box"></div>
+            <div class="btn-row">
+              <button class="btn secondary" id="copyBtn">コピーする</button>
+              <button class="btn secondary" id="retryBtn">もう一度診断する</button>
+            </div>
+          </div>
+        </div>
+
+        <p class="footer-note">
+          ※この診断は医療的な判定を行うものではありません。今の自分の傾向や心の距離感を見つめるためのセルフチェックとしてご利用ください。
+        </p>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const questions = [
+      {
+        text: '人と会ったあとでも、どこか満たされない感覚が残ることがある。',
+        types: ['surface']
+      },
+      {
+        text: '一人の時間がないと、気持ちが落ち着きにくい。',
+        types: ['quiet', 'independent']
+      },
+      {
+        text: '本音を話せる相手は、あまり多くないと感じる。',
+        types: ['surface']
+      },
+      {
+        text: '誰かと一緒にいても、心のどこかで距離を感じることがある。',
+        types: ['surface']
+      },
+      {
+        text: '寂しさやつらさがあっても、あまり人に見せないほうだ。',
+        types: ['patience']
+      },
+      {
+        text: '連絡したい気持ちはあっても、自分から動けないことがある。',
+        types: ['thinking']
+      },
+      {
+        text: '人に気を遣いすぎて、あとでぐったり疲れることが多い。',
+        types: ['patience']
+      },
+      {
+        text: '一人でいるのは平気なのに、ときどき急に強い孤独感がくる。',
+        types: ['quiet']
+      },
+      {
+        text: '誰かに頼るより、自分で抱えたほうが早いと思いやすい。',
+        types: ['independent']
+      },
+      {
+        text: 'SNSやまわりの人間関係を見て、余計に孤独を感じることがある。',
+        types: ['thinking']
+      }
+    ];
+
+    const choices = [
+      { label: 'とても当てはまる', score: 3 },
+      { label: 'やや当てはまる', score: 2 },
+      { label: 'あまり当てはまらない', score: 1 },
+      { label: 'ほとんど当てはまらない', score: 0 }
+    ];
+
+    const typePriority = ['surface', 'patience', 'thinking', 'independent', 'quiet'];
+
+    const resultMap = {
+      quiet: {
+        name: '静寂型',
+        description: 'あなたは、一人の時間の中で気持ちを整えやすいタイプです。にぎやかさよりも、静かな時間や落ち着いた距離感の中で回復しやすい傾向があります。\n\nそのため、無理に人と交わり続けるより、ひとりでいるほうが自然に感じられることもあるでしょう。ただ、その静けさが長く続きすぎると、自分でも気づかないうちに心を閉じやすくなることがあります。\n\n孤独そのものが悪いわけではありません。ただ、閉じすぎると、少しずつ苦しさに変わっていくことがあります。',
+        action: '誰かと深い話をしなくても大丈夫です。まずは一人だけに、短い返事やひとことを返してみてください。',
+        closing: '静けさは、弱さではなく感受性です。'
+      },
+      surface: {
+        name: '表面社交型',
+        description: 'あなたは、人と関わることはできても、心の深いところでは満たされにくいタイプです。会話はしていても、「本当にわかってもらえた」と感じる場面が少ないのかもしれません。\n\n周囲に人がいても孤独を感じるのは、あなたが浅いつながりでは満たされにくいからです。それは欠点ではなく、関係の「数」より「質」を大事にする感性とも言えます。\n\nなんとなく付き合う関係が続くほど、心は逆に乾いていくことがあります。あなたには、広くつながることより、少しでも深く通じる関係のほうが合っています。',
+        action: 'たくさんの人とやり取りするより、ひとりだけでいいので、少し本音に近い言葉を使ってみてください。',
+        closing: 'あなたを支えるのは、人数ではなく深さです。'
+      },
+      patience: {
+        name: '我慢蓄積型',
+        description: 'あなたは、寂しさや疲れをすぐには自覚せず、あとから一気に重くなりやすいタイプです。ふだんは平気そうに見えても、内側では少しずつ負担が積み重なっていることがあります。\n\n人に迷惑をかけたくない。なるべくしっかりしていたい。そんな気持ちが強い人ほど、孤独や疲れを静かにため込みやすくなります。\n\n本当に苦しくなるまで気づけないと、自分でも理由がわからないまましんどくなることがあります。あなたに必要なのは、もっと頑張ることではなく、少し早く気づくことです。',
+        action: '「まだ平気」と言い切る前に、「少し疲れているかもしれない」と言葉にしてみてください。',
+        closing: '気づくことは、甘えではなく自分を守る力です。'
+      },
+      thinking: {
+        name: '思考過多型',
+        description: 'あなたは、気持ちを頭の中で整理しようとする力が強いタイプです。そのぶん、考えすぎることで孤独感を深めやすい傾向があります。\n\n「あの時こう言えばよかった」「なぜわかってもらえなかったのだろう」そんなふうに頭の中で何度もやり取りを繰り返し、自分をさらに追い込んでしまうことがあるかもしれません。\n\n考える力は大切です。ただ、心の問題は考えることだけでは整いきらないこともあります。少し身体を動かす、場所を変える、空気を入れ替える。それだけでも心の詰まりがゆるむことがあります。',
+        action: '答えを出そうとせず、5分だけ歩くか、外の空気を吸ってみてください。',
+        closing: '整理できない日があっても、それは弱さではありません。'
+      },
+      independent: {
+        name: '自立強め型',
+        description: 'あなたは、自分で考え、自分で進める力が強いタイプです。一人でいることにも比較的強く、周囲に流されにくい面があります。\n\nその一方で、頼ることや弱さを見せることが後回しになりやすい傾向もあります。気づけば、助けが必要な場面でも、自分ひとりで抱えてしまっているかもしれません。\n\n孤独は、弱い人だけが感じるものではありません。しっかり立っている人ほど、誰にも寄りかからないまま静かに離れていくことがあります。あなたの強さは本物です。でも、強さの中に少しだけ人を入れることは、弱くなることではありません。',
+        action: '相談でなくても大丈夫です。今日あったことを、ひとつだけ誰かに共有してみてください。',
+        closing: '自立と孤立は、似ていて少し違います。'
+      }
+    };
+
+    const levelMap = [
+      {
+        min: 0,
+        max: 9,
+        label: '低め',
+        description: '今のあなたは、孤独に飲み込まれすぎず、自分なりの距離感を保てている状態です。ただし、無理を重ねると変化することもあるので、今の整い方を大切にしてください。'
+      },
+      {
+        min: 10,
+        max: 19,
+        label: 'やや高め',
+        description: '今のあなたは、人との距離感や心の置き場に少し疲れが出やすい時期かもしれません。自分を責めるより、まずは傾向に気づくことが大切です。'
+      },
+      {
+        min: 20,
+        max: 30,
+        label: '高め',
+        description: '今のあなたは、心の中に抱え込みや距離感の難しさが強く出ている可能性があります。無理に明るくするより、今の自分をそのまま理解することから始めてみてください。'
+      }
+    ];
+
+    const startScreen = document.getElementById('startScreen');
+    const questionScreen = document.getElementById('questionScreen');
+    const resultScreen = document.getElementById('resultScreen');
+    const startBtn = document.getElementById('startBtn');
+    const backBtn = document.getElementById('backBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const retryBtn = document.getElementById('retryBtn');
+    const copyBtn = document.getElementById('copyBtn');
+    const questionCounter = document.getElementById('questionCounter');
+    const questionText = document.getElementById('questionText');
+    const choicesWrap = document.getElementById('choices');
+    const progressBar = document.getElementById('progressBar');
+
+    const levelText = document.getElementById('levelText');
+    const typeName = document.getElementById('typeName');
+    const scoreText = document.getElementById('scoreText');
+    const levelDescription = document.getElementById('levelDescription');
+    const typeHeading = document.getElementById('typeHeading');
+    const typeDescription = document.getElementById('typeDescription');
+    const actionText = document.getElementById('actionText');
+    const closingText = document.getElementById('closingText');
+    const shareText = document.getElementById('shareText');
+
+    let currentIndex = 0;
+    let answers = new Array(questions.length).fill(null);
+
+    function showScreen(screen) {
+      [startScreen, questionScreen, resultScreen].forEach(el => el.classList.remove('active'));
+      screen.classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function renderQuestion() {
+      const currentQuestion = questions[currentIndex];
+      questionCounter.textContent = `Q${currentIndex + 1} / ${questions.length}`;
+      questionText.textContent = currentQuestion.text;
+      progressBar.style.width = `${((currentIndex + 1) / questions.length) * 100}%`;
+      backBtn.disabled = currentIndex === 0;
+      backBtn.style.opacity = currentIndex === 0 ? '0.5' : '1';
+
+      choicesWrap.innerHTML = '';
+      choices.forEach((choice, index) => {
+        const btn = document.createElement('button');
+        btn.className = 'choice-btn';
+        btn.textContent = choice.label;
+        if (answers[currentIndex] === index) {
+          btn.classList.add('selected');
+        }
+        btn.addEventListener('click', () => {
+          answers[currentIndex] = index;
+          renderQuestion();
+        });
+        choicesWrap.appendChild(btn);
+      });
+
+      nextBtn.textContent = currentIndex === questions.length - 1 ? '診断結果を見る' : '次へ';
+    }
+
+    function calculateResult() {
+      const totalScore = answers.reduce((sum, answerIndex) => {
+        return sum + choices[answerIndex].score;
+      }, 0);
+
+      const typeScores = {
+        quiet: 0,
+        surface: 0,
+        patience: 0,
+        thinking: 0,
+        independent: 0
+      };
+
+      questions.forEach((question, index) => {
+        const answerIndex = answers[index];
+        const score = choices[answerIndex].score;
+        question.types.forEach(type => {
+          typeScores[type] += score;
+        });
+      });
+
+      let selectedType = typePriority[0];
+      typePriority.forEach(type => {
+        if (typeScores[type] > typeScores[selectedType]) {
+          selectedType = type;
+        }
+      });
+
+      const level = levelMap.find(item => totalScore >= item.min && totalScore <= item.max);
+      const typeData = resultMap[selectedType];
+
+      levelText.textContent = level.label;
+      typeName.textContent = `「${typeData.name}」`;
+      scoreText.textContent = `${totalScore} / 30 点`;
+      levelDescription.textContent = level.description;
+      typeHeading.textContent = typeData.name;
+      typeDescription.innerText = typeData.description;
+      actionText.textContent = typeData.action;
+      closingText.textContent = typeData.closing;
+
+      const share = `孤独度診断をやってみたら「${typeData.name}」でした。\n${typeData.closing}\n少し当たっていて、ちょっと考えさせられた。`;
+      shareText.textContent = share;
+    }
+
+    startBtn.addEventListener('click', () => {
+      currentIndex = 0;
+      answers = new Array(questions.length).fill(null);
+      renderQuestion();
+      showScreen(questionScreen);
+    });
+
+    backBtn.addEventListener('click', () => {
+      if (currentIndex > 0) {
+        currentIndex -= 1;
+        renderQuestion();
+      }
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (answers[currentIndex] === null) {
+        alert('回答を選んでください。');
+        return;
+      }
+
+      if (currentIndex < questions.length - 1) {
+        currentIndex += 1;
+        renderQuestion();
+      } else {
+        calculateResult();
+        showScreen(resultScreen);
+      }
+    });
+
+    retryBtn.addEventListener('click', () => {
+      showScreen(startScreen);
+    });
+
+    copyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(shareText.textContent);
+        copyBtn.textContent = 'コピーしました';
+        setTimeout(() => {
+          copyBtn.textContent = 'コピーする';
+        }, 1600);
+      } catch (error) {
+        alert('コピーに失敗しました。手動でコピーしてください。');
+      }
+    });
+  </script>
+</body>
+</html>
